@@ -38,7 +38,7 @@ android {
             testCoverageEnabled true
             minifyEnabled false
             applicationIdSuffix ".debug"
-            versionNameSuffix '.' + new Date().format("yyyyMMddHHmmss")
+            versionNameSuffix '.' + new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone('UTC'))
 
             // -PuseFabric passed in on gradle build command will enable fabric for a debug build
             // This allows us to keep from sending up fabric statistics on CI builds
