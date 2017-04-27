@@ -9,3 +9,6 @@
 /build
 /captures
 .externalNativeBuild
+
+# fabric
+**/fabric.properties
