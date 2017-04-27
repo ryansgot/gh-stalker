@@ -24,3 +24,8 @@ test:
     - mkdir $CIRCLE_TEST_REPORTS/app
     - cp -r app/build/reports/* $CIRCLE_TEST_REPORTS/app
     - bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN
+deployment:
+  integration:
+    branch: integration
+    commands:
+      - ./gradlew uploadDebugToHockeyApp -PhockeyAppToken=$HOCKEYAPP_TOKEN

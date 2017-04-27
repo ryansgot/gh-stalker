@@ -1,5 +1,6 @@
 buildscript {
     repositories {
+        mavenCentral()
         maven { url 'https://maven.fabric.io/public' }
     }
 
@@ -7,10 +8,12 @@ buildscript {
         // The Fabric Gradle plugin uses an open ended version to react
         // quickly to Android tooling updates
         classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'de.felixschulze.gradle:gradle-hockeyapp-plugin:3.5'
     }
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'de.felixschulze.gradle.hockeyapp'
 
 android {
     compileSdkVersion 25
@@ -23,8 +26,15 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    signingConfigs {
+        debug {
+            storeFile rootProject.file('app' + File.separator + 'keystore' + File.separator + 'integration.keystore')
+        }
+    }
     buildTypes {
         debug {
+            signingConfigs.debug
+
             testCoverageEnabled true
             minifyEnabled false
             applicationIdSuffix ".debug"
@@ -65,4 +75,13 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+}
+
+hockeyapp {
+    // pass -PhockeyAppToken=<your_hockeyapp_token> or put hockeyAppToken=<your_hockeyapp_token>
+    // in the ~/.gradle/gradle.properties file
+    apiToken = project.hasProperty("hockeyAppToken") ? project.property("hockeyAppToken") : ""
+    releaseType = 2     // 0 = beta, 1 = live, 2 = alpha
+    notify = 1          // notify all testers that can install this app
+    status = 2          // 1 = do not allow download, 2 = make version available for download
 }
