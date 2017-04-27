@@ -33,11 +33,12 @@ android {
     }
     buildTypes {
         debug {
-            signingConfigs.debug
+            signingConfig signingConfigs.debug
 
             testCoverageEnabled true
             minifyEnabled false
             applicationIdSuffix ".debug"
+            versionNameSuffix '.' + new Date().format("yyyyMMddHHmmss")
 
             // -PuseFabric passed in on gradle build command will enable fabric for a debug build
             // This allows us to keep from sending up fabric statistics on CI builds
