@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
-public class BaseStalkerActivityTest {
+public class StalkerActivityTest {
 
     @Rule
     public ActivityTestRule<StalkerActivity> activityTestRule = new ActivityTestRule<StalkerActivity>(StalkerActivity.class) {

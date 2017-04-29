@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">GH Stalker</string>
+    <string name="go_button_label">Go</string>
+    <string name="gh_username_entry_hint">Username</string>
 </resources>

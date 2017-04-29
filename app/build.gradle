@@ -66,6 +66,10 @@ dependencies {
     compile "com.google.dagger:dagger:$daggerVersion"
     annotationProcessor "com.google.dagger:dagger-compiler:$daggerVersion"
 
+    // butterknife
+    compile "com.jakewharton:butterknife:$butterknifeVersion"
+    annotationProcessor "com.jakewharton:butterknife-compiler:$butterknifeVersion"
+
     releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:$leakCanaryVersion"
 
     debugCompile "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
