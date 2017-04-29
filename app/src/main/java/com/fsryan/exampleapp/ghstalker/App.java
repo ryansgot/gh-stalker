@@ -1,6 +1,7 @@
 package com.fsryan.exampleapp.ghstalker;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
@@ -12,7 +13,15 @@ import java.util.List;
 import io.fabric.sdk.android.Fabric;
 import io.fabric.sdk.android.Kit;
 
+import static com.fsryan.exampleapp.ghstalker.ComponentsLoader.loadComponentsOf;
+
 public class App extends Application {
+
+    /*package*/ Components components;
+
+    public static Components components(Context context) {
+        return ((App) context.getApplicationContext()).components;
+    }
 
     @Override
     public void onCreate() {
@@ -27,6 +36,8 @@ public class App extends Application {
         }
 
         startFabric(this);
+
+        components = loadComponentsOf(this);
     }
 
     private static void startFabric(App app) {

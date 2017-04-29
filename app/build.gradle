@@ -39,7 +39,8 @@ android {
             // fabric always enabled for release builds
             buildConfigField "boolean", "CRASHLYTICS_ENABLED", "true"
             buildConfigField "boolean", "ANSWERS_ENABLED", "true"
-            buildConfigField "boolean", "LEAK_CANARY_ENABLED", "false"  // <-- leak canary never enabled for release
+            buildConfigField "boolean", "LEAK_CANARY_ENABLED", "false"
+            // <-- leak canary never enabled for release
         }
     }
 }
@@ -61,21 +62,49 @@ dependencies {
         transitive = true;
     }
 
+    // dagger
+    compile "com.google.dagger:dagger:$daggerVersion"
+    annotationProcessor "com.google.dagger:dagger-compiler:$daggerVersion"
+
+    // auto-value
+    provided "com.google.auto.value:auto-value:$autoValueVersion"
+    annotationProcessor "com.google.auto.value:auto-value:$autoValueVersion"
+
+    // rx
+    compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+    compile "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
+    compile "com.trello.rxlifecycle2:rxlifecycle:$rxLifecycleVersion"
+    compile "com.trello.rxlifecycle2:rxlifecycle-android:$rxLifecycleVersion"
+    compile "com.trello.rxlifecycle2:rxlifecycle-components:$rxLifecycleVersion"
+
+    // butterknife
+    compile "com.jakewharton:butterknife:$butterknifeVersion"
+    annotationProcessor "com.jakewharton:butterknife-compiler:$butterknifeVersion"
+
     releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:$leakCanaryVersion"
 
     debugCompile "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
 
     testCompile 'junit:junit:4.12'
     testCompile "com.squareup.leakcanary:leakcanary-android-no-op:$leakCanaryVersion"
+    testCompile "org.mockito:mockito-core:$mockitoVersion"
 
+    androidTestCompile "org.mockito:mockito-core:$mockitoVersion"
+    androidTestCompile "com.linkedin.dexmaker:dexmaker-mockito:1.5.1"
     androidTestCompile "com.android.support:support-annotations:$supportLibVersion"
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2') {
+    androidTestCompile("com.android.support.test.espresso:espresso-core:$espressoVersion") {
         exclude group: 'com.android.support', module: 'appcompat'
         exclude group: 'com.android.support', module: 'support-v4'
         exclude module: 'recyclerview-v7'
     }
     androidTestCompile "com.squareup.leakcanary:leakcanary-android-no-op:$leakCanaryVersion"
+    androidTestCompile 'com.android.support.test:runner:0.5'
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'com.google.code.findbugs:jsr305:3.0.1'
+    }
 }
 
 hockeyapp {
