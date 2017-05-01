@@ -1,5 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'de.felixschulze.gradle.hockeyapp'
+apply plugin: 'org.ajoberstar.grgit'
+//apply plugin: 'org.ajoberstar.release-base'
+apply plugin: 'org.ajoberstar.release-opinion'
 
 android {
     compileSdkVersion 25
@@ -8,8 +11,8 @@ android {
         applicationId "com.fsryan.exampleapp.ghstalker"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 1
-        versionName "0.0.1"
+        versionName "${project.version}"
+        versionCode toVersionCode(versionName)
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -24,7 +27,6 @@ android {
             testCoverageEnabled true
             minifyEnabled false
             applicationIdSuffix ".debug"
-            versionNameSuffix '.' + new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone('UTC'))
 
             // -PuseFabric passed in on gradle build command will enable fabric for a debug build
             // This allows us to keep from sending up fabric statistics on CI builds
@@ -114,4 +116,31 @@ hockeyapp {
     releaseType = 2     // 0 = beta, 1 = live, 2 = alpha
     notify = 1          // notify all testers that can install this app
     status = 2          // 1 = do not allow download, 2 = make version available for download
+}
+
+afterEvaluate {
+    if (project.hasProperty("release.stage")) {
+        if ("final".equals(project.property("release.stage"))) {
+            //tasks.release.dependsOn insert name of google play release task
+        } else {
+            tasks.release.dependsOn 'uploadDebugToHockeyApp'
+        }
+    }
+}
+
+// TODO: perhaps make a quick plugin to update the android version name and code with the below
+def static int toVersionCode(String semVer) {
+    int plusIdx = semVer.indexOf('+')
+    String strippedName = plusIdx == -1 ? semVer : semVer.substring(0, plusIdx)
+    strippedName = strippedName.replaceAll("[^.0-9]", "")
+    String[] splitVersion = strippedName.split("\\.")
+
+    int versionCode = 0
+    int multiplier = 10000
+    for (int i = 0; i < 3; i++) {
+        versionCode += multiplier * Integer.parseInt(splitVersion[i])
+        multiplier /= 100
+    }
+
+    return versionCode
 }
