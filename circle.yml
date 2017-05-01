@@ -28,4 +28,4 @@ deployment:
   integration:
     branch: integration
     commands:
-      - ./gradlew clean uploadDebugToHockeyApp -PhockeyAppToken=$HOCKEYAPP_TOKEN -PuseLeakCanary -PuseCrashlytics
+      - ./gradlew clean release -Prelease.stage=rc -PhockeyAppToken=$HOCKEYAPP_TOKEN -PuseLeakCanary -PuseCrashlytics
