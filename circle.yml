@@ -1,3 +1,7 @@
+general:
+  branches:
+    ignore:
+      - /post_integration-.*/ # list of branches to ignore
 machine:
   java:
     version: oraclejdk8
@@ -29,4 +33,5 @@ deployment:
   integration:
     branch: integration
     commands:
+      - git checkout -b "post_integration-$(cat app/version.txt)"
       - ./gradlew clean release -PpushRelease -PhockeyAppToken=$HOCKEYAPP_TOKEN -PuseLeakCanary -PuseCrashlytics
