@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'de.felixschulze.gradle.hockeyapp'
 apply plugin: 'ch.netzwerg.release'
+apply plugin: 'jacoco'
 
 android {
     compileSdkVersion 25
@@ -121,6 +122,78 @@ release {
     // TODO: update when there is an automated release task for a release build
     dependsOn (project.hasProperty("hockeyAppToken") ? 'uploadDebugToHockeyApp' : 'assembleDebug')
     push = project.hasProperty("pushRelease")
+}
+
+// TODO: create a plugin for merging reports
+task jacocoMerge(type: JacocoMerge, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
+    doFirst {
+        List<String> androidExecFiles = new FileNameByRegexFinder().getFileNames(project.projectDir.absolutePath, /.*\.ec/)
+        executionData = executionData + files(androidExecFiles)
+    }
+    destinationFile = file('build/jacoco/debug_merged.exec')
+    executionData = files('build/jacoco/testDebugUnitTest.exec')
+}
+
+task jacocoMergedReport(type: JacocoReport, dependsOn: 'jacocoMerge') {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+    executionData = files('build/jacoco/debug_merged.exec')
+    sourceDirectories = files('src/main/java')
+    classDirectories = fileTree(
+            dir: 'build/intermediates/classes/debug',
+            includes: ['**/com/fsryan/exampleapp/ghstalker/**'],
+            excludes: [
+                    '**/R$*.class',                                                                 // generated R subclasses
+                    '**/R.class',                                                                   // generated R classes
+                    '**/*Test.class',                                                               // filter test classes
+                    '**/BuildConfig*',                                                              // generated BuildConfig classes
+
+                    '**/*_*.class',                                                                 // Butterknife/AutoValue/Dagger-generated classes
+                    '**/Dagger*.class',                                                             // Dagger-generated classes
+            ]
+    )
+}
+
+task jacocoLocalReport(type: JacocoReport, dependsOn: 'testDebugUnitTest') {
+    group = 'Reporting'
+    description = 'Generate Jacoco coverage reports after running tests.'
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+
+    classDirectories = fileTree(
+            dir: 'build/intermediates/classes/debug',
+            excludes: [
+                    // Android classes
+                    '**/R$*.class',                                                                 // generated R subclasses
+                    '**/R.class',                                                                   // generated R classes
+                    '**/*Test.class',                                                               // filter test classes
+                    '**/BuildConfig*',                                                              // generated BuildConfig classes
+                    '**/*Activity.class',                                                           // Activities will be tested in UI Tests
+                    '**/*Activity$*.class',                                                         // Activity inner classes will be tested in UI Tests
+                    '**/App.class',                                                                 // App will be tested in UI Tests
+                    '**/*Fragment.class',                                                           // Fragments will be tested in UI Tests
+                    '**/*Fragment$*.class',                                                         // Fragments will be tested in UI Tests
+
+                    '**/*_*.class',                                                                 // Butterknife/AutoValue/Dagger-generated classes
+                    '**/Dagger*.class',                                                             // Dagger-generated classes
+            ]
+    )
+
+    sourceDirectories = files('src/main/java')
+    executionData = files('build/jacoco/testDebugUnitTest.exec')
+
+    doFirst {
+        files('build/intermediates/classes/debug').getFiles().each { file ->
+            if (file.name.contains('$$')) {
+                file.renameTo(file.path.replace('$$', '$'))
+            }
+        }
+    }
 }
 
 // TODO: perhaps make a quick plugin to update the android version name and code with the below
