@@ -1,8 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'de.felixschulze.gradle.hockeyapp'
-apply plugin: 'org.ajoberstar.grgit'
-//apply plugin: 'org.ajoberstar.release-base'
-apply plugin: 'org.ajoberstar.release-opinion'
+apply plugin: 'ch.netzwerg.release'
 
 android {
     compileSdkVersion 25
@@ -27,6 +25,7 @@ android {
             testCoverageEnabled true
             minifyEnabled false
             applicationIdSuffix ".debug"
+            versionNameSuffix '.' + new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone('UTC'))
 
             // -PuseFabric passed in on gradle build command will enable fabric for a debug build
             // This allows us to keep from sending up fabric statistics on CI builds
@@ -118,21 +117,15 @@ hockeyapp {
     status = 2          // 1 = do not allow download, 2 = make version available for download
 }
 
-afterEvaluate {
-    if (project.hasProperty("release.stage")) {
-        if ("final".equals(project.property("release.stage"))) {
-            //tasks.release.dependsOn insert name of google play release task
-        } else {
-            tasks.release.dependsOn 'uploadDebugToHockeyApp'
-        }
-    }
+release {
+    // TODO: update when there is an automated release task for a release build
+    dependsOn (project.hasProperty("hockeyAppToken") ? 'uploadDebugToHockeyApp' : 'assembleDebug')
+    push = project.hasProperty("pushRelease")
 }
 
 // TODO: perhaps make a quick plugin to update the android version name and code with the below
 def static int toVersionCode(String semVer) {
-    int plusIdx = semVer.indexOf('+')
-    String strippedName = plusIdx == -1 ? semVer : semVer.substring(0, plusIdx)
-    strippedName = strippedName.replaceAll("[^.0-9]", "")
+    String strippedName = semVer.replaceAll("[^.0-9]", "")
     String[] splitVersion = strippedName.split("\\.")
 
     int versionCode = 0
