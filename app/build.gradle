@@ -202,10 +202,10 @@ def static int toVersionCode(String semVer) {
     String[] splitVersion = strippedName.split("\\.")
 
     int versionCode = 0
-    int multiplier = 10000
+    int multiplier = 1000000
     for (int i = 0; i < 3; i++) {
         versionCode += multiplier * Integer.parseInt(splitVersion[i])
-        multiplier /= 100
+        multiplier /= 1000
     }
 
     return versionCode
