@@ -1,3 +1,7 @@
+general:
+  branches:
+    ignore:
+      - /post_integration-.*/ # list of branches to ignore
 machine:
   java:
     version: oraclejdk8
@@ -11,6 +15,7 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter build-tools-25.0.2,android-25
 test:
   pre:
+    - echo "circle username = $CIRCLE_USERNAME"
     - emulator -avd circleci-android22 -no-audio -no-window:
         background: true
         parallel: true
@@ -19,7 +24,7 @@ test:
     # unlock the emulator screen
     - sleep 30
     - adb shell input keyevent 82
-    - ./gradlew testDebugUnitTest createDebugCoverageReport -PdisablePreDex
+    - ./gradlew jacocoMergedReport -PdisablePreDex
   post:
     - mkdir $CIRCLE_TEST_REPORTS/app
     - cp -r app/build/reports/* $CIRCLE_TEST_REPORTS/app
@@ -28,4 +33,5 @@ deployment:
   integration:
     branch: integration
     commands:
+      - git checkout -b "post_integration-$(cat app/version.txt)"
       - ./gradlew clean release -PpushRelease -PhockeyAppToken=$HOCKEYAPP_TOKEN -PuseLeakCanary -PuseCrashlytics
