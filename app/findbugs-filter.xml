@@ -1,0 +1,17 @@
+<FindBugsFilter>
+    <Match>
+        <Class name="~.*\.R$" />
+    </Match>
+    <Match>
+        <Class name="~.*\.R\$.*" />
+    </Match>
+    <Match>
+        <Class name="~.*_.*" />
+    </Match>
+
+    <!-- TODO: remove this filter -->
+    <Match>
+        <Class name="com.fsryan.exampleapp.ghstalker.stalker.StalkerActivity$1" />
+        <Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON" />
+    </Match>
+</FindBugsFilter>
