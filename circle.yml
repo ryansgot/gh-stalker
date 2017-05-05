@@ -26,9 +26,8 @@ test:
     - adb shell input keyevent 82
     - ./gradlew jacocoMergedReport -PdisablePreDex
   post:
-    - mkdir $CIRCLE_TEST_REPORTS/app
-    - cp -r app/build/reports/* $CIRCLE_TEST_REPORTS/app
-    - bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN
+    - if [ -d app/build/reports ]; then mkdir $CIRCLE_TEST_REPORTS/app; cp -r app/build/reports/* $CIRCLE_TEST_REPORTS/app; fi
+    - bash <(curl -s https://codecov.io/bash) -Z -t $CODECOV_TOKEN -f $CIRCLE_TEST_REPORTS/app/jacoco/jacocoMergedReport/jacocoMergedReport.xml
 deployment:
   integration:
     branch: integration
