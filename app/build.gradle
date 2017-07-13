@@ -50,7 +50,9 @@ android {
 }
 
 repositories {
-    maven { url 'https://maven.fabric.io/public' }
+    maven {
+        url 'https://maven.fabric.io/public'
+    }
 }
 
 dependencies {
