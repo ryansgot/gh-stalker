@@ -24,10 +24,10 @@ test:
     # unlock the emulator screen
     - sleep 30
     - adb shell input keyevent 82
-    - ./gradlew jacocoMergedReport -PdisablePreDex
+    - ./gradlew createMergedDebugReport -PdisablePreDex
   post:
     - if [ -d app/build/reports ]; then mkdir $CIRCLE_TEST_REPORTS/app; cp -r app/build/reports/* $CIRCLE_TEST_REPORTS/app; fi
-    - bash <(curl -s https://codecov.io/bash) -Z -t $CODECOV_TOKEN -f $CIRCLE_TEST_REPORTS/app/jacoco/jacocoMergedReport/jacocoMergedReport.xml
+    - bash <(curl -s https://codecov.io/bash) -Z -t $CODECOV_TOKEN -f $CIRCLE_TEST_REPORTS/app/jacoco/createMergedDebugReport/createMergedDebugReport.xml
 deployment:
   integration:
     branch: integration

@@ -37,7 +37,7 @@ public class StalkerActivityTest {
 
     @Test
     public void shouldCallPresenterFindFollowersMethodOnGoButtonClick() {
-        final String ghUserName = "test gh username";
+        final String ghUserName = "test GH username";
         onView(withId(R.id.gh_username_entry_text)).perform(typeText(ghUserName));
         onView(withId(R.id.go_button)).perform(click());
         verify(MOCK_STALKER_PRESENTER).findFollowers(eq(FindFollowersUserEvent.make(ghUserName)));
