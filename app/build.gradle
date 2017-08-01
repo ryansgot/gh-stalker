@@ -1,6 +1,6 @@
+apply plugin: 'autosemver-git'  // <-- applying autosemver-git prior to com.android.application allowed for setting the version correctly
 apply plugin: 'com.android.application'
 apply plugin: 'de.felixschulze.gradle.hockeyapp'
-apply plugin: 'ch.netzwerg.release'
 apply plugin: 'android-java-coverage-merger'
 apply plugin: 'jacoco'
 apply plugin: 'findbugs'
@@ -12,8 +12,6 @@ android {
         applicationId "com.fsryan.exampleapp.ghstalker"
         minSdkVersion 16
         targetSdkVersion 25
-        versionName "${project.version}"
-        versionCode toVersionCode(versionName)
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -28,7 +26,6 @@ android {
             testCoverageEnabled true
             minifyEnabled false
             applicationIdSuffix ".debug"
-            versionNameSuffix '.' + new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone('UTC'))
 
             // -PuseFabric passed in on gradle build command will enable fabric for a debug build
             // This allows us to keep from sending up fabric statistics on CI builds
@@ -113,6 +110,36 @@ configurations.all {
     }
 }
 
+autosemver {
+    branchConfigs {
+        integration {   // <-- Integration builds go to testers and this should be the destination of dev work
+            skipCiCommitMessageSuffix = '[skip ci]'
+            pullRemote = 'origin'
+            pushRemote = 'origin'
+            versionIncrement = 'patch'
+            metaData = Long.toString(new Date().getTime())
+        }
+        alpha {         // <-- bugfixes DO NOT go here--only new features
+            skipCiCommitMessageSuffix = '[skip ci]'
+            pullRemote = 'origin'
+            pushRemote = 'origin'
+            versionIncrement = 'minor'
+            preRelease = 'alpha'    // <-- new features only ever delivered to alpha--therefore, minor version bump here
+        }
+        beta {      // <-- bugfixes may go here from integration
+            skipCiCommitMessageSuffix = '[skip ci]'
+            pullRemote = 'origin'
+            pushRemote = 'origin'
+            preRelease = "beta"
+        }
+        master {    // <-- bugfixes may go here from integration
+            skipCiCommitMessageSuffix = '[skip ci]'
+            pullRemote = 'origin'
+            pushRemote = 'origin'
+        }
+    }
+}
+
 mergedReportConfig {
     classFilters {
         debug {
@@ -137,12 +164,6 @@ hockeyapp {
     releaseType = 2     // 0 = beta, 1 = live, 2 = alpha
     notify = 1          // notify all testers that can install this app
     status = 2          // 1 = do not allow download, 2 = make version available for download
-}
-
-release {
-    // TODO: update when there is an automated release task for a release build
-    dependsOn (project.hasProperty("hockeyAppToken") ? 'uploadDebugToHockeyApp' : 'assembleDebug')
-    push = project.hasProperty("pushRelease")
 }
 
 afterEvaluate {
@@ -175,19 +196,4 @@ afterEvaluate {
         tasks.findByName("upload${variant.name.capitalize()}ToHockeyApp").dependsOn(task)
         findbugsTask.dependsOn(task)
     }
-}
-
-// TODO: perhaps make a quick plugin to update the android version name and code with the below
-def static int toVersionCode(String semVer) {
-    String strippedName = semVer.replaceAll("[^.0-9]", "")
-    String[] splitVersion = strippedName.split("\\.")
-
-    int versionCode = 0
-    int multiplier = 1000000
-    for (int i = 0; i < 3; i++) {
-        versionCode += multiplier * Integer.parseInt(splitVersion[i])
-        multiplier /= 1000
-    }
-
-    return versionCode
 }
